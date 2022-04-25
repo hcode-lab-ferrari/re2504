@@ -1,0 +1,59 @@
+version: '3.3'
+services:
+    ferrari-db:
+        image: mysql
+        container_name: ferrari-db
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: r00t14789632
+            MYSQL_DATABASE: ferrari
+        ports:
+            - 3306:3306
+        volumes:
+            - ./mysql/data:/var/lib/mysql
+        deploy:
+            resources:
+                limits:
+                    cpus: 1
+                    memory: 1024M
+    ferrari-api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: npm run start:indocker
+        container_name: ferrari-api
+        restart: always
+        environment:
+            DATABASE_URL: 'mysql://root:r00t14789632@ferrari-db:3306/ferrari'
+            JWT_SECRET: 'BTpcUs{4..E0F?$h'
+            JWT_EXPIRES: 604800
+            MAIL_HOST: smtp.gmail.com
+            MAIL_PORT: 587
+            MAIL_USER: ferrarihcodelab@gmail.com
+            MAIL_PASS: '123ABC'
+            MAIL_FROM: ferrarihcodelab@gmail.com
+            TYPEORM_CONNECTION: mysql
+            TYPEORM_HOST: ferrari-db
+            TYPEORM_USERNAME: root
+            TYPEORM_PASSWORD: r00t14789632
+            TYPEORM_DATABASE: ferrari
+            TYPEORM_PORT: 3306
+            TYPEORM_SYNCHRONIZE: 'true'
+            TYPEORM_LOGGING: 'false'
+            TYPEORM_MIGRATIONS_DIR: 'typeorm/migration'
+            TYPEORM_MIGRATIONS: 'typeorm/migration/**/*.ts'
+            URL_FRONT: 'http://localhost:3001'
+            MERCADOPAGO_TOKEN: 'TEST-7616885355313638-082821-be6f0b78fd48c093f62d708f4da39c84-86861555'
+        ports:
+            - 3000:3000
+        volumes:
+            - .:/usr/src/api
+        deploy:
+            resources:
+                limits:
+                    cpus: 2
+                    memory: 2048M
+        depends_on:
+            - ferrari-db
+        links:
+            - ferrari-db
