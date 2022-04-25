@@ -1,0 +1,37 @@
+{
+  "name": "ferrari-2.0",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "sass": "sass --watch public/assets/sass/main.scss:public/assets/css/main.css",
+    "sass:build": "sass public/assets/sass/main.scss:public/assets/css/main.css --style=compressed",
+    "dev": "webpack serve --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "cropperjs": "^1.5.12",
+    "date-fns": "^2.28.0",
+    "firebase": "^9.6.11",
+    "imask": "^6.4.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.4",
+    "css-loader": "^5.2.7",
+    "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^1.6.2",
+    "sass": "^1.50.1",
+    "sass-loader": "^10.2.1",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^9.2.8",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.2",
+    "webpack-merge": "^5.8.0"
+  }
+}

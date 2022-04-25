@@ -1,0 +1,138 @@
+const CACHE_NAME = 'ferrari-cache-hcodelab';
+const urlsToCache = [
+	"/404.html",
+	"/auth.html",
+	"/change-password.html",
+	"/change-photo.html",
+	"/index.html",
+	"/main.js",
+	"/profile.html",
+	"/schedules-address-create.html",
+	"/schedules-address-update.html",
+	"/schedules-address.html",
+	"/schedules-complete.html",
+	"/schedules-new.html",
+	"/schedules-payment.html",
+	"/schedules-services.html",
+	"/schedules-summary.html",
+	"/schedules-time-options.html",
+	"/schedules.html",
+	"/assets/css/main.css",
+	"/assets/css/main.css.map",
+	"/assets/fonts/NothingYouCouldDo-Regular.ttf",
+	"/assets/fonts/OpenSans-Bold.ttf",
+	"/assets/fonts/OpenSans-BoldItalic.ttf",
+	"/assets/fonts/OpenSans-ExtraBold.ttf",
+	"/assets/fonts/OpenSans-ExtraBoldItalic.ttf",
+	"/assets/fonts/OpenSans-Italic.ttf",
+	"/assets/fonts/OpenSans-Light.ttf",
+	"/assets/fonts/OpenSans-LightItalic.ttf",
+	"/assets/fonts/OpenSans-Regular.ttf",
+	"/assets/fonts/OpenSans-SemiBold.ttf",
+	"/assets/fonts/OpenSans-SemiBoldItalic.ttf",
+	"/assets/fonts/Teko-Regular.ttf",
+	"/assets/images/android-icon-144x144.png",
+	"/assets/images/android-icon-192x192.png",
+	"/assets/images/android-icon-36x36.png",
+	"/assets/images/android-icon-48x48.png",
+	"/assets/images/android-icon-72x72.png",
+	"/assets/images/android-icon-96x96.png",
+	"/assets/images/apple-icon-114x114.png",
+	"/assets/images/apple-icon-120x120.png",
+	"/assets/images/apple-icon-144x144.png",
+	"/assets/images/apple-icon-152x152.png",
+	"/assets/images/apple-icon-180x180.png",
+	"/assets/images/apple-icon-57x57.png",
+	"/assets/images/apple-icon-60x60.png",
+	"/assets/images/apple-icon-72x72.png",
+	"/assets/images/apple-icon-76x76.png",
+	"/assets/images/apple-icon-precomposed.png",
+	"/assets/images/apple-icon.png",
+	"/assets/images/arrow-down.svg",
+	"/assets/images/arrow-left.svg",
+	"/assets/images/arrow-right.svg",
+	"/assets/images/arrow-up-small.svg",
+	"/assets/images/arrow-up.svg",
+	"/assets/images/calendar.svg",
+	"/assets/images/check-circle.svg",
+	"/assets/images/CreditCardBack.svg",
+	"/assets/images/CreditCardFront.svg",
+	"/assets/images/exit-to-app.svg",
+	"/assets/images/facebook.svg",
+	"/assets/images/favicon-16x16.png",
+	"/assets/images/favicon-32x32.png",
+	"/assets/images/favicon-96x96.png",
+	"/assets/images/favicon.ico",
+	"/assets/images/ferrari-amarela.png",
+	"/assets/images/ferrari-amarela.webp",
+	"/assets/images/ferrari-amarela@2x.png",
+	"/assets/images/ferrari-amarela@2x.webp",
+	"/assets/images/ferrari-azul.png",
+	"/assets/images/ferrari-azul.webp",
+	"/assets/images/ferrari-azul@2x.png",
+	"/assets/images/ferrari-azul@2x.webp",
+	"/assets/images/ferrari-footer.svg",
+	"/assets/images/ferrari-interior.png",
+	"/assets/images/ferrari-interior.webp",
+	"/assets/images/ferrari-interior@2x.png",
+	"/assets/images/ferrari-interior@2x.webp",
+	"/assets/images/ferrari-logo.ico",
+	"/assets/images/ferrari-logo.png",
+	"/assets/images/ferrari-logo.svg",
+	"/assets/images/ferrari-vermelha-1200.png",
+	"/assets/images/ferrari-vermelha-1200.webp",
+	"/assets/images/ferrari-vermelha.png",
+	"/assets/images/ferrari-vermelha.webp",
+	"/assets/images/ferrari-vermelha@2x.png",
+	"/assets/images/ferrari-vermelha@2x.webp",
+	"/assets/images/icon-google-place.svg",
+	"/assets/images/icon-phone.svg",
+	"/assets/images/icon-skype.svg",
+	"/assets/images/icon-twitter.svg",
+	"/assets/images/instagram.svg",
+	"/assets/images/logo_256.png",
+	"/assets/images/logo_512.png",
+	"/assets/images/mapa.png",
+	"/assets/images/mapa.webp",
+	"/assets/images/mapa@2x.png",
+	"/assets/images/mapa@2x.webp",
+	"/assets/images/mobi.png",
+	"/assets/images/mobi@2x.png",
+	"/assets/images/ms-icon-144x144.png",
+	"/assets/images/ms-icon-150x150.png",
+	"/assets/images/ms-icon-310x310.png",
+	"/assets/images/ms-icon-70x70.png",
+	"/assets/images/payments.svg",
+	"/assets/images/services.svg",
+	"/assets/images/tools.svg",
+	"/assets/images/twitter.svg",
+	"/assets/images/uno.png",
+	"/assets/images/user.png",
+	"/assets/images/user.webp",
+	"/assets/images/user@2x.png",
+	"/assets/images/user@2x.webp",
+	"/assets/images/user@4x.png",
+	"/assets/images/youtube.svg"
+]
+
+self.addEventListener('install', function(event){
+    event.waitUntil(
+        caches.open('v1')
+        .then(function(cache){
+            console.log('Opened cache');
+            return cache.addAll(urlsToCache)
+        })
+    );
+});
+
+self.addEventListener('activate', event => {
+    event.waitUntil(self.clients.claim())
+})
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request).then( response => {
+            return response || fetch(event.request)
+        })
+    );
+});
