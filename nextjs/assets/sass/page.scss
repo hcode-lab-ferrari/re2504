@@ -26,7 +26,7 @@ header {
 
 .page {
   flex-direction: column;
-  margin-bottom: 80px;
+  margin-bottom: 58px;
   height: calc(100vh - 158px);
   overflow: auto;
   &.page-summary {
@@ -84,6 +84,10 @@ header {
     a.black {
       @include button-black;
     }
+    button.red,
+    a.red {
+      @include button-red;
+    }
   }
   .toast {
     position: fixed;
@@ -115,9 +119,23 @@ header {
       }
     }
     &.success {
-      color: #155724;
-      background-color: #d4edda;
-      border-color: #c3e6cb;
+      color: var(--success-color);
+      background-color: var(--success-bg);
+      border-color: var(--success-border);
+    }
+    &.danger {
+      color: var(--danger-color);
+      background-color: var(--danger-bg);
+      border-color: var(--danger-border);
+    }
+  }
+  @media (max-width: 1199px) {
+    &.with-panel {
+      .toast {
+        &.open {
+          transform: translateY(-130px);
+        }
+      }
     }
   }
   &.blue {
@@ -134,6 +152,28 @@ header {
   &.green {
     > header {
       background-color: var(--green);
+    }
+    footer.fixed {
+      button[type='submit'],
+      a.black {
+        @include button;
+      }
+    }
+  }
+  &.red {
+    > header {
+      background-color: var(--red);
+    }
+    footer.fixed {
+      button[type='submit'],
+      a.black {
+        @include button;
+      }
+    }
+  }
+  &.yellow {
+    > header {
+      background-color: var(--yellow);
     }
     footer.fixed {
       button[type='submit'],
@@ -171,6 +211,11 @@ header {
 
 @media (min-width: 1200px) {
   .page {
+    &.with-panel {
+      .toast {
+        max-width: calc(100% - 375px);
+      }
+    }
     height: calc(100vh - 198px);
     > header {
       justify-content: flex-start;
