@@ -1,30 +1,39 @@
-import { Fragment } from "react";
-import Calendar from "../components/Calendar";
-import Header from "../components/Header";
-import Page from "../components/Page";
-import Footer from "../components/Page/Footer";
+import { Fragment, useCallback, useState } from 'react';
+import Calendar from '../components/Calendar';
+import Header from '../components/Header';
+import Page from '../components/Page';
+import Footer from '../components/Page/Footer';
+import { format } from 'date-fns';
 
 const SchedulesNew = () => {
+  const [scheduleAt, setScheduleAt] = useState<Date | null>(null);
 
-    return (
-        <Fragment>
-            <Header />
-            <Page
-                pageColor="blue"
-                title="Escolha a Data"
-                id="schedules-new"
-            >
-                <Calendar />
+  const onSubmit = useCallback(
+    (event: any) => {
+      event.preventDefault();
 
-                <form action="schedules-time-options.html">
-                    <input type="hidden" name="schedule_at" />
+      console.log(scheduleAt);
+    },
+    [scheduleAt]
+  );
 
-                    <Footer />
-                </form>
-            </Page>
-        </Fragment>
-    );
+  return (
+    <Fragment>
+      <Header />
+      <Page pageColor="blue" title="Escolha a Data" id="schedules-new">
+        <Calendar selected={new Date()} onChange={setScheduleAt} />
+        <form onSubmit={onSubmit}>
+          <input
+            type="hidden"
+            name="schedule_at"
+            value={scheduleAt ? format(scheduleAt, 'yyyy-MM-dd') : ''}
+          />
 
-}
+          <Footer />
+        </form>
+      </Page>
+    </Fragment>
+  );
+};
 
 export default SchedulesNew;
