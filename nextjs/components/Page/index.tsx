@@ -1,10 +1,13 @@
+import { ReactNode } from "react";
+
 type PageColor = 'blue' | 'green' | 'yellow' | 'red';
 
 type PageProps = {
-    children: React.ReactNode;
+    children: ReactNode;
     title: string;
     id: string;
     pageColor: PageColor;
+    panel?: ReactNode;
 };
 
 const Page = ({
@@ -12,6 +15,7 @@ const Page = ({
     title,
     id,
     pageColor,
+    panel,
 }: PageProps) => {
 
     return (
@@ -26,6 +30,8 @@ const Page = ({
             <main>
                 {children}
             </main>
+
+            {panel && panel}
         </section>
     );
 
