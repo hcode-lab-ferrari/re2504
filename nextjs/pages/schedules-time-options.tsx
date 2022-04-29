@@ -6,10 +6,19 @@ import Page from '../components/Page';
 import Footer from '../components/Page/Footer';
 import { sessionOptions } from '../utils/session';
 import { ScheduleSession } from '../types/ScheduleSession';
-import { format, getDay, parse } from 'date-fns';
+import { format, getDay, parse, parseJSON } from 'date-fns';
 import locale from 'date-fns/locale/pt-BR';
 import axios from 'axios';
 import { TimeOption } from '../types/TimeOption';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { get } from 'lodash';
+import Toast from '../components/Toast';
+import { useRouter } from 'next/router';
+
+type FormData = {
+  scheduleAt: string;
+  timeOptionId: string;
+}
 
 type ComponentPageProps = {
   schedule: ScheduleSession;
@@ -18,8 +27,29 @@ type ComponentPageProps = {
 
 const ComponentPage: NextPage<ComponentPageProps> = (props) => {
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    clearErrors,
+    setError,
+  } = useForm<FormData>();
+  const router = useRouter();
   const [scheduleAt] = useState(props.schedule.scheduleAt);
   const [timeOptions] = useState(props.timeOptions);
+
+  const save: SubmitHandler<FormData> = (data) => {
+
+    axios
+      .post('/api/schedules/time-options', data)
+      .then(() => router.push("/schedules-services"))
+      .catch((error) => {
+        setError('scheduleAt', {
+          message: error.response?.data.message ?? error.message,
+        });
+      });
+
+  };
 
   return (
     <Fragment>
@@ -34,11 +64,10 @@ const ComponentPage: NextPage<ComponentPageProps> = (props) => {
           <hr />
         </header>
 
-        <form>
+        <form onSubmit={handleSubmit(save)}>
           <input
             type="hidden"
-            name="schedule_at"
-            value={scheduleAt}
+            {...register("scheduleAt", { value: scheduleAt })}
           />
 
           <h3>{format(
@@ -48,11 +77,32 @@ const ComponentPage: NextPage<ComponentPageProps> = (props) => {
           )}</h3>
 
           <div className="options">
-            <label>
-              <input type="radio" name="option" value="9:00" checked />
-              <span>9:00</span>
-            </label>
+            {timeOptions.map((option) => (
+              <label
+                key={String(option.id)}
+              >
+                <input
+                  type="radio"
+                  value={option.id}
+                  defaultChecked
+                  {...register("timeOptionId", {
+                    required: "Selecione o horário desejado.",
+                  })}
+                />
+                <span>{format(new Date(option.time), "HH:mm", { locale })}</span>                 
+              </label>
+            ))}
           </div>
+
+          <Toast
+            type='danger'
+            open={Object.keys(errors).length > 0}
+            onClose={() => clearErrors()}
+          >
+            {Object.keys(errors).map((err) => (
+              get(errors, `${err}.message`, 'Verifique os horários.')
+            ))}
+          </Toast>
 
           <Footer />
         </form>
