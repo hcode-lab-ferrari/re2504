@@ -1,7 +1,7 @@
 import axios from "axios";
 import { withIronSessionSsr } from "iron-session/next";
 import { NextPage } from "next";
-import { ChangeEvent, Fragment } from "react";
+import { ChangeEvent, Fragment, useEffect } from "react";
 import Header from "../components/Header";
 import Page from "../components/Page";
 import Footer from "../components/Page/Footer";
@@ -13,18 +13,26 @@ import Panel from "../components/Schedule/Panel";
 import ScheduleServiceProvider, { useScheduleService } from "../components/Schedule/ScheduleServiceContext";
 import MenuProvider from "../contexts/MenuContext";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { get } from "lodash";
+import { useRouter } from "next/router";
 
 type FormData = {
     services: number[];
+    server?: unknown;
 }
 
 const SchedulesServicesPage = () => {
 
-    const { services, addSelectedService, removeSelectedService } = useScheduleService();
+    const { services, selecteds, addSelectedService, removeSelectedService } = useScheduleService();
 
     const {
         handleSubmit,
+        setValue,
+        setError,
+        formState: { errors },
+        clearErrors,
     } = useForm<FormData>();
+    const router = useRouter();
 
     const onChangeService = (checked: boolean, serviceId: number) => {
 
@@ -38,9 +46,34 @@ const SchedulesServicesPage = () => {
 
     const save: SubmitHandler<FormData> = ({ services }) => {
 
-        console.log(services);
+        if (services.length === 0) {
+            setError("services", {
+                type: "required",
+                message: "Escolha pelo menos um serviço.",
+            });
+            return false;
+        }
+
+        axios
+            .post("/api/schedules/services", { services, })
+            .then(() => router.push("/schedules-payment"))
+            .catch((error) => {
+                setError("server", {
+                    message: error.response?.data.message ?? error.message,
+                });
+            });
 
     }
+
+    useEffect(() => {
+
+        setValue("services", selecteds.map((service) => service.id));
+
+        if (selecteds.length > 0) {
+            clearErrors();
+        }
+
+    }, [selecteds, setValue, clearErrors]);
 
     return (
         <Page
@@ -78,6 +111,16 @@ const SchedulesServicesPage = () => {
                         </label>
                     ))}
                 </div>
+
+                <Toast
+                    type='danger'
+                    open={Object.keys(errors).length > 0}
+                    onClose={() => clearErrors()}
+                >
+                    {Object.keys(errors).map((err) => (
+                        get(errors, `${err}.message`, 'Verifique os serviços selecionados.')
+                    ))}
+                </Toast>
 
                 <Footer />
             </form>
