@@ -12,5 +12,6 @@ export const sessionOptions: IronSessionOptions = {
 declare module 'iron-session' {
   interface IronSessionData {
     schedule: ScheduleSession;
+    token: string;
   }
 }

@@ -1,17 +1,13 @@
 import axios from "axios";
-import { withIronSessionSsr } from "iron-session/next";
 import { NextPage } from "next";
-import { ChangeEvent, Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import Header from "../components/Header";
 import Page from "../components/Page";
 import Footer from "../components/Page/Footer";
 import Toast from "../components/Toast";
-import { ScheduleService } from "../types/ScheduleService";
 import { formatCurrency } from "../utils/formatCurrency";
-import { sessionOptions } from "../utils/session";
 import Panel from "../components/Schedule/Panel";
 import ScheduleServiceProvider, { useScheduleService } from "../components/Schedule/ScheduleServiceContext";
-import MenuProvider from "../contexts/MenuContext";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { get } from "lodash";
 import { useRouter } from "next/router";
