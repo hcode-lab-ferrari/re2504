@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import Link from "next/link";
-import { useEffect } from "react";
 import AuthProvider, { useAuth } from "../components/Auth/AuthContext";
 import FormEmail from "../components/Auth/FormEmail";
 import FormForget from "../components/Auth/FormForget";
@@ -11,8 +10,6 @@ import FormReset from "../components/Auth/FormReset";
 const AuthMain = () => {
 
     const { currentForm } = useAuth();
-
-    useEffect(() => console.log({ currentForm }), [currentForm]);
 
     return <main id="auth">
         <section>

@@ -1,10 +1,10 @@
+import Link from "next/link";
 import React from "react";
 import { useAuth } from "../AuthContext";
 
 const FormEmail = () => {
 
     const { email, setEmail, onSubmitEmail } = useAuth();
-
 
     return <form id="auth-email" onSubmit={onSubmitEmail}>
         <h1>Autenticação</h1>
@@ -17,7 +17,9 @@ const FormEmail = () => {
         </div>
 
         <div className="actions">
-            <a href="auth.html#register" className="link">Criar uma Conta</a>
+            <Link href="/auth#register">
+                <a className="link">Criar uma Conta</a>
+            </Link>
             <button type="submit">Próxima</button>
         </div>
     </form>

@@ -1,10 +1,14 @@
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { FormDataRegister } from "../../../types/Auth/FormDataRegister";
 import { useAuth } from "../AuthContext";
 
 const FormRegister = () => {
 
-    const { email, setEmail } = useAuth();
+    const { register, handleSubmit } = useForm<FormDataRegister>();
+    const { email, setEmail, onSubmitRegister } = useAuth();
 
-    return <form id="auth-register" className="register">
+    return <form id="auth-register" className="register" onSubmit={handleSubmit<FormDataRegister>(onSubmitRegister)}>
         <h1>Criar conta</h1>
 
         <hr />
@@ -15,31 +19,39 @@ const FormRegister = () => {
         </div>
 
         <div className="field">
-            <input type="text" name="name" id="name" />
+            <input type="text" id="name" {...register('name', {
+                required: 'Preencha o campo nome.'
+            })} />
             <label htmlFor="name">Nome Completo</label>
         </div>
 
         <div className="field">
-            <input type="date" name="birth_at" id="birth_at" />
+            <input type="date" id="birth_at" {...register('birthAt')} />
             <label htmlFor="birth_at">Data de Nascimento</label>
         </div>
 
         <div className="field">
-            <input type="password" name="password" id="password_new" />
+            <input type="password" id="password_new" {...register('password', {
+                required: 'Preencha o campo senha.'
+            })} />
             <label htmlFor="password_new">Crie uma Senha</label>
         </div>
 
         <div className="field">
             <input
                 type="password"
-                name="password_confirm"
                 id="password_confirm"
+                {...register('passwordConfirm', {
+                    required: 'Preencha o campo confirmação de senha.',
+                })}
             />
             <label htmlFor="password_confirm">Confirme a Senha</label>
         </div>
 
         <div className="actions">
-            <a href="auth.html#login" className="link">Já tem uma conta?</a>
+            <Link href="/auth#login">
+                <a className="link">Já tem uma conta?</a>
+            </Link>
             <button type="submit">Cadastrar</button>
         </div>
     </form>

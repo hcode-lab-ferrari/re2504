@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormDataLogin } from "../../../types/Auth/FormDataLogin";
@@ -29,8 +30,12 @@ const FormLogin = () => {
 
         <div className="actions">
             <div>
-                <a href="#forget" className="link">Esqueceu sua senha?</a>
-                <a href="#email" className="link">Este não é o seu e-mail?</a>
+                <Link href="/auth#forget">
+                    <a className="link">Esqueceu sua senha?</a>
+                </Link>
+                <Link href="/auth#forget">
+                    <a href="/auth#email" className="link">Este não é o seu e-mail?</a>
+                </Link>
             </div>
             <button type="submit">Login</button>
         </div>
