@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { addMonths, format } from "date-fns";
-import { GetServerSidePropsContext, GetServerSidePropsResult, NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { Fragment, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IMaskInput } from "react-imask";
@@ -15,7 +15,7 @@ import { get } from "lodash";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { sessionOptions } from "../utils/session";
-import { withIronSessionSsr } from "iron-session/next/dist";
+import { withIronSessionSsr } from "iron-session/next";
 
 type ScheduleCreate = {
 	installments: number;

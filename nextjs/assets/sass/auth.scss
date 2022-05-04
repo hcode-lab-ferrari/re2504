@@ -16,7 +16,7 @@
         height: 100%;
         a {
             display: contents;
-            img {
+            img, svg {
                 position: absolute;
                 width: 100px;
                 top: 40px;
@@ -101,7 +101,7 @@
             width: 500px;
             height: initial;
             a {
-                img {
+                img, svg {
                     top: 25px;
                 }
             }
