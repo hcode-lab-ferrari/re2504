@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { sessionOptions } from "../utils/session";
 import { withIronSessionSsr } from "iron-session/next";
 import { withAuthentication } from "../utils/withAuthentication";
+import { isTokenValid } from "../utils/isTokenValid";
 
 type ScheduleCreate = {
     installments: number;
