@@ -10,10 +10,14 @@ import { Address } from "../types/Address"
 import Toast from "../components/Toast"
 import { get } from "lodash"
 import { SubmitHandler, useForm } from "react-hook-form"
-import Footer from "../components/Page/Footer"
+import Footer, { ButtonBack, ButtonContinue } from "../components/Page/Footer"
 import { getOnlyNumbers } from "../utils/getOnlyNumbers"
 import { useRouter } from "next/router"
 import { useAuth } from "../components/Auth/AuthContext"
+
+type ComponentPageProps = {
+    address: Address;
+}
 
 type ZipCodeResponse = {
     cep: string;
@@ -33,11 +37,13 @@ type FormData = {
     state: string;
     country: string;
     zipCode: string;
+    id?: string;
 }
 
-type AddressCreateResponse = Address;
+type AddressUpdateResponse = Address;
+type AddressApiResponse = Address;
 
-const ComponentPage: NextPage = () => {
+const ComponentPage: NextPage<ComponentPageProps> = ({ address }) => {
 
     const {
         register,
@@ -95,7 +101,7 @@ const ComponentPage: NextPage = () => {
 
         data.zipCode = getOnlyNumbers(zipCode);
 
-        axios.post<AddressCreateResponse>("/addresses", data, {
+        axios.put<AddressUpdateResponse>(`/addresses/${address.id}`, data, {
             baseURL: process.env.API_URL,
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -114,6 +120,34 @@ const ComponentPage: NextPage = () => {
                     });
                 }
             });
+
+    }
+
+    const onClickDelete = () => {
+
+        if (confirm("Deseja realmente excluir o endereço?")) {
+
+            axios.delete(`/addresses/${address.id}`, {
+                baseURL: process.env.API_URL,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+                .then(() => {
+                    router.push(`/schedules-address`);
+                })
+                .catch((e) => {
+                    if (e.response.data.error === "Unauthorized") {
+                        router.push(`/auth?next=${router.pathname}`);
+                    } else {
+                        setError("id", {
+                            type: "required",
+                            message: e.message,
+                        });
+                    }
+                });
+
+        }
 
     }
     
@@ -135,6 +169,7 @@ const ComponentPage: NextPage = () => {
                                 {...register("zipCode", {
                                     required: "O campo CEP é obrigatório.",
                                     onChange: (event) => { searchZipCode(event.target.value) },
+                                    value: address.zipCode
                                 })}
                             />
                             <label htmlFor="zipcode">CEP</label>
@@ -155,6 +190,7 @@ const ComponentPage: NextPage = () => {
                                 id="address"
                                 {...register("street", {
                                     required: "O campo endereço é obrigatório.",
+                                    value: address.street,
                                 })}
                             />
                             <label htmlFor="address">Endereço</label>
@@ -164,7 +200,9 @@ const ComponentPage: NextPage = () => {
                             <input
                                 type="text"                                
                                 id="number"
-                                {...register("number")}
+                                {...register("number", {
+                                    value: address.number,
+                                })}
                             />
                             <label htmlFor="number">Número</label>
                         </div>
@@ -174,7 +212,9 @@ const ComponentPage: NextPage = () => {
                         <input
                             type="text"
                             id="complement"
-                            {...register("complement")}
+                            {...register("complement", {
+                                value: address.complement,
+                            })}
                         />
                         <label htmlFor="complement">Complemento</label>
                     </div>
@@ -185,6 +225,7 @@ const ComponentPage: NextPage = () => {
                             id="district"
                             {...register("district", {
                                 required: "O campo bairro é obrigatório.",
+                                value: address.district,
                             })}
                         />
                         <label htmlFor="district">Bairro</label>
@@ -196,6 +237,7 @@ const ComponentPage: NextPage = () => {
                             id="city"
                             {...register("city", {
                                 required: "O campo cidade é obrigatório.",
+                                value: address.city,
                             })}
                         />
                         <label htmlFor="city">Cidade</label>
@@ -208,6 +250,7 @@ const ComponentPage: NextPage = () => {
                                 id="state"
                                 {...register("state", {
                                     required: "O campo estado é obrigatório.",
+                                    value: address.state,
                                 })}
                             />
                             <label htmlFor="state">Estado</label>
@@ -219,6 +262,7 @@ const ComponentPage: NextPage = () => {
                                 id="country"
                                 {...register("country", {
                                     required: "O campo país é obrigatório",
+                                    value: address.country,
                                 })}
                             />
                             <label htmlFor="country">País</label>
@@ -234,7 +278,18 @@ const ComponentPage: NextPage = () => {
                             get(errors, `${err}.message`, 'Verifique os serviços selecionados.')
                         ))}
                     </Toast>
-                    <Footer />
+                    <Footer
+                        buttons={[
+                            ButtonBack,
+                            {
+                                value: "Excluir",
+                                type: "button",
+                                onClick: onClickDelete,
+                                className: "red",
+                            },
+                            ButtonContinue,
+                        ]}
+                    />
 
                 </form>
             </Page>
@@ -244,4 +299,25 @@ const ComponentPage: NextPage = () => {
 
 export default ComponentPage;
 
-export const getServerSideProps = withAuthentication();
+export const getServerSideProps = withAuthentication(async (context) => {
+
+    try {
+
+        const { data: address } = await axios.get<AddressApiResponse>(`/addresses/${context.query.id}`, {
+            baseURL: process.env.API_URL,
+            headers: {
+                Authorization: `Bearer ${context.req.session.token}`,
+            },
+        });
+    
+        return {
+            props: {
+                address,
+            },
+        };
+
+    } catch (e: any) {
+        return redirectToAuth(context);
+    }
+
+});

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { AuthContextType } from "../../../types/Auth/AuthContextType";
+import { AuthenticationResponse } from "../../../types/Auth/AuthenticationResponse";
 import { AuthProviderProps } from "../../../types/Auth/AuthProviderProps";
 import { CurrentFormType } from "../../../types/Auth/CurrentFormType";
 import { FormDataLogin } from "../../../types/Auth/FormDataLogin";
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
     onSubmitPasswordReset: () => { },
     onSubmitForget: () => { },
     loadingFormForget: false,
+    token: null,
 });
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -112,6 +114,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     }, [setCurrentForm, getHashForm]);
 
+    const initAuth = () => {
+
+        axios.get<AuthenticationResponse>("/api/session")
+        .then(({ data: { token } }) => setToken(token));
+
+    };
+
     useEffect(() => {
 
         window.addEventListener('load', handlerCurrentForm);
@@ -127,6 +136,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }, [router, handlerCurrentForm]);
 
     useEffect(() => {
+
+        initAuth();
 
         setCurrentForm(getHashForm());
 
@@ -147,7 +158,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         onSubmitRegister,
         onSubmitPasswordReset,
         onSubmitForget,
-        loadingFormForget
+        loadingFormForget,
+        token,
     }}>{children}</AuthContext.Provider>
 }
 

@@ -18,9 +18,10 @@ type FormData = {
 
 type ComponentPageProps = {
     addresses: Address[];
+    addressSelected: number;
 }
 
-const ComponentPage: NextPage<ComponentPageProps> = ({ addresses }) => {
+const ComponentPage: NextPage<ComponentPageProps> = ({ addresses, addressSelected }) => {
 
     const {
         register,
@@ -28,6 +29,7 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ addresses }) => {
         formState: { errors },
         clearErrors,
         setError,
+        setValue,
     } = useForm<FormData>();
 
     const onSubmit: SubmitHandler<FormData> = ({ billingAddressId }) => {
@@ -41,6 +43,10 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ addresses }) => {
         console.log(billingAddressId);
 
     }
+
+    useEffect(() => {
+        if (addressSelected > 0) setValue("billingAddressId", String(addressSelected));
+    }, [addressSelected]);
     
     return (
         <Fragment>
@@ -91,7 +97,7 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ addresses }) => {
                                         {zipCode}
                                     </address>
                                 </div>
-                                <Link href="/schedules-address-update">
+                                <Link href={`/schedules-address-update?id=${id}`}>
                                     <a className="btn-update">Editar</a>
                                 </Link>
                             </label>
@@ -132,6 +138,7 @@ export const getServerSideProps = withAuthentication(async (context) => {
         return {
             props: {
                 addresses,
+                addressSelected: Number(context.query.selected) ?? 0,
             },
         };
 

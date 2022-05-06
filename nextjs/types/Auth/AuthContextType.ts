@@ -13,4 +13,5 @@ export type AuthContextType = {
     onSubmitPasswordReset: (data: FormDataPasswordReset) => void;
     onSubmitForget: () => void;
     loadingFormForget: boolean;
+    token: string | null;
 }
