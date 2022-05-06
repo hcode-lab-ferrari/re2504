@@ -11,6 +11,7 @@ import Toast from "../components/Toast"
 import { get } from "lodash"
 import { SubmitHandler, useForm } from "react-hook-form"
 import Footer from "../components/Page/Footer"
+import { useRouter } from "next/router"
 
 type FormData = {
     billingAddressId: string;   
@@ -31,6 +32,7 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ addresses, addressSelecte
         setError,
         setValue,
     } = useForm<FormData>();
+    const router = useRouter();
 
     const onSubmit: SubmitHandler<FormData> = ({ billingAddressId }) => {
 
@@ -40,7 +42,18 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ addresses, addressSelecte
             });
         }
 
-        console.log(billingAddressId);
+        axios.post('/api/schedules/address', { billingAddressId, })
+            .then(() => { router.push("/schedules-payment") })
+            .catch((e: any) => {
+                if (e.response.data.error === "Unauthorized") {
+                    router.push(`/auth?next=${router.pathname}`);
+                } else {
+                    setError("billingAddressId", {
+                        type: "required",
+                        message: e.message,
+                    });
+                }
+            });
 
     }
 

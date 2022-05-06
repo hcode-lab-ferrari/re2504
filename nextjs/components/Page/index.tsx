@@ -4,9 +4,9 @@ type PageColor = 'blue' | 'green' | 'yellow' | 'red';
 
 type PageProps = {
     children: ReactNode;
-    title: string;
+    title: string | ReactNode;
     id: string;
-    pageColor: PageColor;
+    pageColor?: PageColor;
     panel?: ReactNode;
 };
 

@@ -17,13 +17,15 @@ import { useRouter } from "next/router";
 import { sessionOptions } from "../utils/session";
 import { withIronSessionSsr } from "iron-session/next";
 import { withAuthentication } from "../utils/withAuthentication";
-import { isTokenValid } from "../utils/isTokenValid";
 
 type ScheduleCreate = {
     installments: number;
     cardToken: string;
     paymentMethod: string;
     document: string;
+    cardFirstSixDigits: string;
+    cardLastFourDigits: string;
+    paymentTypeId: string;
 }
 
 type FormData = {
@@ -80,6 +82,7 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ amount }) => {
     const [issuers, setIssuers] = useState<Issuer[]>([]);
     const [installmentOptions, setInstallmentOptions] = useState<InstallmentOption[]>([]);
     const [paymentMethodId, setPaymentMethodId] = useState('');
+    const [paymentTypeId, setPaymentTypeId] = useState('');
     const initMercadoPago = () => {
 
         setMp(new MercadoPago(process.env.MERCADOPAGO_KEY, {
@@ -117,6 +120,7 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ amount }) => {
                 const options = response[0];
 
                 setPaymentMethodId(options.payment_method_id);
+                setPaymentTypeId(options.payment_type_id);
                 setValue('installments', '1');
 
                 setInstallmentOptions(options.payer_costs.map((cost: any) => ({
@@ -233,6 +237,9 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ amount }) => {
             document: cardDocument,
             installments: Number(installments),
             paymentMethod: paymentMethodId,
+            cardFirstSixDigits: response.first_six_digits,
+            cardLastFourDigits: response.last_four_digits,
+            paymentTypeId,
         })).catch((error: any) => {
             setError('token', {
                 message: error.message
