@@ -1,6 +1,10 @@
+import { Schedule } from "./Schedule";
+import { Service } from "./Service";
+
 export type ScheduleService = {
-    id: number;
-    name: string;
-    description: string;
-    price: string;
+    scheduleId: number;
+    schedule?: Schedule;
+
+    serviceId: number;
+    service?: Service;
 }

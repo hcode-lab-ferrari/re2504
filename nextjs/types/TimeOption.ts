@@ -1,5 +1,5 @@
 export type TimeOption = {
     id: number;
-    day: string;
+    day: number;
     time: string;
 }

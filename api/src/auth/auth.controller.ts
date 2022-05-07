@@ -24,7 +24,7 @@ export class AuthController {
         private authService: AuthService,
         private usersService: UsersService,
         private photoService: PhotoService,
-    ) {}
+    ) { }
 
     @Post()
     async verifyLogin(@Body('email') email) {
@@ -107,7 +107,7 @@ export class AuthController {
         FileInterceptor('file', {
             dest: './storage/photos',
             limits: {
-                fileSize: 5 * 1024 * 1024,
+                fileSize: 50 * 1024 * 1024,
                 files: 1,
             },
         }),

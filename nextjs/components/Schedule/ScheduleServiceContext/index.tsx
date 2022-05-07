@@ -1,10 +1,10 @@
 import axios from "axios";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { ScheduleService } from "../../../types/ScheduleService";
+import { Service } from "../../../types/Service";
 
 type ScheduleServiceContextProps = {
-    services: ScheduleService[];
-    selecteds: ScheduleService[];
+    services: Service[];
+    selecteds: Service[];
     addSelectedService: (serviceId: number) => void;
     removeSelectedService: (serviceId: number) => void;
 }
@@ -12,8 +12,8 @@ type ScheduleServiceContextProps = {
 const ScheduleServiceContext = createContext<ScheduleServiceContextProps>({
     services: [],
     selecteds: [],
-    addSelectedService: () => {},
-    removeSelectedService: () => {},
+    addSelectedService: () => { },
+    removeSelectedService: () => { },
 });
 
 export default function ScheduleServiceProvider({
@@ -22,8 +22,8 @@ export default function ScheduleServiceProvider({
     children: ReactNode;
 }) {
 
-    const [services, setServices] = useState<ScheduleService[]>([]);
-    const [selecteds, setSelecteds] = useState<ScheduleService[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
+    const [selecteds, setSelecteds] = useState<Service[]>([]);
 
     const addSelectedService = (serviceId: number) => {
 
@@ -39,7 +39,7 @@ export default function ScheduleServiceProvider({
 
         const service = services.find((service) => service.id === serviceId);
 
-        if (service) {            
+        if (service) {
             setSelecteds(selecteds.filter((item) => item.id !== service.id));
         }
 
@@ -47,10 +47,10 @@ export default function ScheduleServiceProvider({
 
     const loadServices = () => {
         axios
-        .get<ScheduleService[]>(`/services`, {
-            baseURL: process.env.API_URL,
-        })
-        .then(({ data }) => setServices(data));
+            .get<Service[]>(`/services`, {
+                baseURL: process.env.API_URL,
+            })
+            .then(({ data }) => setServices(data));
     }
 
     useEffect(() => loadServices(), []);

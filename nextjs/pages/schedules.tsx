@@ -2,37 +2,49 @@ import { Fragment, useEffect, useState } from "react";
 import { withAuthentication } from "../utils/withAuthentication";
 import Header from "../components/Header";
 import Page from "../components/Page";
-import Footer, { ButtonBack } from "../components/Page/Footer";
+import Footer from "../components/Page/Footer";
 import { NextPage, Redirect } from "next";
 import { ScheduleSession } from "../types/ScheduleSession";
 import { format, parseJSON } from "date-fns";
 import locale from "date-fns/locale/pt-BR";
 import { Schedule } from "../types/Schedule";
-import { formatCurrency } from "../utils/formatCurrency";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useRouter } from "next/router";
-import Toast from "../components/Toast";
-import { get } from "lodash";
+import { redirectToAuth } from "../utils/redirectToAuth";
+import Title from "../components/Page/Title";
+import { formatCurrency } from "../utils/formatCurrency";
+import ScheduleItem from "../components/Schedule/ScheduleItem";
 
 type FormData = {
     server?: unknown;
 }
 
 type ComponentPageProps = {
-    schedule: ScheduleSession;
-    data: Schedule;
+    schedules: Schedule[];
+    token: string;
 }
 
-const ComponentPage: NextPage<ComponentPageProps> = ({ schedule, data }) => {
+const ComponentPage: NextPage<ComponentPageProps> = ({ schedules, token }) => {
 
-    const {
-        handleSubmit,
-        setError,
-        formState: { errors },
-        clearErrors,
-    } = useForm<FormData>();
-    const router = useRouter();
+    const [nextSchedules, setNextSchedules] = useState<Schedule[]>(schedules.filter(s => new Date(s.scheduleAt).getTime() > new Date().getTime()));
+    const [historySchedules, setHistorySchedules] = useState<Schedule[]>(schedules.filter(s => new Date(s.scheduleAt).getTime() <= new Date().getTime()));
+
+    const onCanceled = () => {
+
+        axios.get<Schedule[]>(`/schedules`, {
+            baseURL: process.env.API_URL,
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }).then(({ data }) => {
+
+            setNextSchedules(data.filter(s => new Date(s.scheduleAt).getTime() > new Date().getTime()));
+            setHistorySchedules(data.filter(s => new Date(s.scheduleAt).getTime() <= new Date().getTime()));
+
+        }).catch(console.error);
+
+    }
 
     return (
         <Fragment>
@@ -41,125 +53,18 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ schedule, data }) => {
                 title={"Agendamentos"}
                 id="schedules"
             >
-                <header className="page-title">
-                    <h2>Próximos</h2>
-                    <hr />
-                </header>
+                <Title value="Próximos" />
 
                 <ul>
-                    <li>
-                        <section>
-                        <div>
-                            <label>Data</label>
-                            <span>02/07/2020 às 9:00</span>
-                        </div>
-                        <div>
-                            <label>Status</label>
-                            <span>Confirmado</span>
-                        </div>
-                        <div>
-                            <label>Valor</label>
-                            <span>R$ 100,00</span>
-                        </div>
-                        <div className="service">
-                            <label>Serviço</label>
-                            <span>Revisão do Veículo</span>
-                        </div>
-                        </section>
-                        <button type="button" className="cancel">Cancelar</button>
-                    </li>
-                    <li>
-                        <section>
-                        <div>
-                            <label>Data</label>
-                            <span>02/07/2020 às 9:00</span>
-                        </div>
-                        <div>
-                            <label>Status</label>
-                            <span>Confirmado</span>
-                        </div>
-                        <div>
-                            <label>Valor</label>
-                            <span>R$ 100,00</span>
-                        </div>
-                        <div className="service">
-                            <label>Serviço</label>
-                            <span>Revisão do Veículo</span>
-                        </div>
-                        </section>
-                        <button type="button" className="cancel">Cancelar</button>
-                    </li>
-                    <li>
-                        <section>
-                        <div>
-                            <label>Data</label>
-                            <span>02/07/2020 às 9:00</span>
-                        </div>
-                        <div>
-                            <label>Status</label>
-                            <span>Confirmado</span>
-                        </div>
-                        <div>
-                            <label>Valor</label>
-                            <span>R$ 100,00</span>
-                        </div>
-                        <div className="service">
-                            <label>Serviço</label>
-                            <span>Revisão do Veículo</span>
-                        </div>
-                        </section>
-                        <button type="button" className="cancel">Cancelar</button>
-                    </li>
-                    <li>
-                        <section>
-                        <div>
-                            <label>Data</label>
-                            <span>02/07/2020 às 9:00</span>
-                        </div>
-                        <div>
-                            <label>Status</label>
-                            <span>Aguardando Pagamento</span>
-                        </div>
-                        <div>
-                            <label>Valor</label>
-                            <span>R$ 100,00</span>
-                        </div>
-                        <div className="service">
-                            <label>Serviço</label>
-                            <span>Revisão do Veículo</span>
-                        </div>
-                        </section>
-                        <button type="button" className="cancel">Cancelar</button>
-                    </li>
+                    {nextSchedules.length === 0 && <li>Não há próximos agendamentos.</li>}
+                    {nextSchedules.map((schedule, index) => <ScheduleItem key={index} token={token} schedule={schedule} onCanceled={onCanceled} />)}
                 </ul>
 
-                <header className="page-title">
-                    <h2>Histórico</h2>
-                    <hr />
-                </header>
+                <Title value="Histórico" />
 
                 <ul>
-                    <li>
-                        <section>
-                        <div>
-                            <label>Data</label>
-                            <span>02/07/2020 às 9:00</span>
-                        </div>
-                        <div>
-                            <label>Status</label>
-                            <span>Confirmado</span>
-                        </div>
-                        <div>
-                            <label>Valor</label>
-                            <span>R$ 100,00</span>
-                        </div>
-                        <div className="service">
-                            <label>Serviço</label>
-                            <span>Revisão do Veículo</span>
-                        </div>
-                        </section>
-                        <button type="button" className="cancel">Cancelar</button>
-                    </li>
+                    {historySchedules.length === 0 && <li>Não há histórico de agendamentos.</li>}
+                    {historySchedules.map((schedule, index) => <ScheduleItem key={index} token={token} schedule={schedule} />)}
                 </ul>
                 <Footer
                     buttons={[
@@ -178,13 +83,13 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ schedule, data }) => {
 
 export default ComponentPage;
 
-export const getServerSideProps = withAuthentication(async ({ req }) => {
+export const getServerSideProps = withAuthentication(async (context) => {
 
     try {
 
-        const { token, schedule } = req.session;
+        const { token } = context.req.session;
 
-        const { data } = await axios.get(`/schedules/${req.session.schedule.data?.id}`, {
+        const { data: schedules } = await axios.get(`/schedules`, {
             baseURL: process.env.API_URL,
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -193,17 +98,13 @@ export const getServerSideProps = withAuthentication(async ({ req }) => {
 
         return {
             props: {
-                data,
-                schedule,
+                schedules,
+                token
             },
         };
 
     } catch (e) {
-        return {
-            redirect: {
-                destination: '/schedules-summary',
-            } as Redirect,
-        };
+        return redirectToAuth(context);
     }
 
 });
