@@ -152,9 +152,10 @@ export class UsersService {
             dataPerson.name = name;
         }
 
-        if (birthAt) {
+        if (birthAt && birthAt instanceof Date) {
             try {
-                dataPerson.birthAt = parse(birthAt, 'yyyy-MM-dd', new Date());
+                birthAt.setHours(0, 0, 0, 0);
+                dataPerson.birthAt = birthAt;
             } catch (e) {
                 throw new BadRequestException('Birth date is invalid');
             }
@@ -314,7 +315,7 @@ export class UsersService {
                 id,
             },
             data: {
-                photo: null,
+                photo,
             },
         });
     }

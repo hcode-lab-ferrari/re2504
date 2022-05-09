@@ -21,7 +21,7 @@ export class UpdateUsersDto extends PartialType(CreateUsersDto) {
 
     @IsOptional()
     @IsDateString()
-    birthAt: string;
+    birthAt: Date;
 
     @IsOptional()
     @IsString()
