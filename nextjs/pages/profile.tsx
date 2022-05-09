@@ -4,6 +4,7 @@ import { get } from "lodash";
 import { NextPage } from "next";
 import { Fragment, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useAuth } from "../components/Auth/AuthContext";
 import Header from "../components/Header";
 import Page from "../components/Page";
 import Footer from "../components/Page/Footer";
@@ -13,6 +14,7 @@ import { MeResponse } from "../types/MeResponse";
 import { User } from "../types/User";
 import { redirectToAuth } from "../utils/redirectToAuth";
 import { withAuthentication } from "../utils/withAuthentication";
+import Head from "next/head";
 
 type FormData = {
     name: string;
@@ -31,21 +33,24 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ token, user }) => {
     const [toastType, setToastType] = useState<'success' | 'danger'>('danger');
     const [toastOpen, setToastOpen] = useState(false);
 
+    const { user: contextUser, setUser } = useAuth();
+
     const { register, handleSubmit, formState: { errors }, clearErrors, setError } = useForm<FormData>({
         defaultValues: {
             name: user.person?.name,
             email: user.email,
-            birthAt: user.person?.birthAt ? format(new Date(String(user.person?.birthAt)), 'yyyy-MM-dd') : '',
+            birthAt: user.person?.birthAt ? user.person.birthAt.substring(0, 10) : '',
         }
     });
 
     const onSubmit: SubmitHandler<FormData> = (data) => {
-        axios.put(`/auth/profile`, data, {
+        axios.put<User>(`/auth/profile`, data, {
             baseURL: process.env.API_URL,
             headers: {
                 Authorization: `Bearer ${token}`,
             }
-        }).then(() => {
+        }).then(({ data }) => {
+            setUser(data);
             setToastType('success');
             setToastOpen(true);
             setTimeout(() => {
@@ -70,6 +75,9 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ token, user }) => {
     }, [errors]);
 
     return <Fragment>
+        <Head>
+            <title>Hcode Lab - Editar Dados</title>
+        </Head>
         <Header />
         <Page
             title={"Editar Dados"}
@@ -93,9 +101,7 @@ const ComponentPage: NextPage<ComponentPageProps> = ({ token, user }) => {
                 </div>
 
                 <div className="field">
-                    <input type="date" id="birth_at" {...register('birthAt', {
-                        valueAsDate: true
-                    })} />
+                    <input type="date" id="birth_at" {...register('birthAt')} />
                     <label htmlFor="birth_at">Data de Nascimento</label>
                 </div>
 

@@ -4,6 +4,7 @@ import { sessionOptions } from '../../utils/session';
 import axios from 'axios';
 import { ScheduleCreate } from '../../types/ScheduleCreate';
 import { ScheduleSession } from '../../types/ScheduleSession';
+import { Schedule } from '../../types/Schedule';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -41,7 +42,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         })
     }
 
-    const response = await axios.post<ScheduleCreate>(`/payment`, data, {
+    const response = await axios.post<Schedule>(`/payment`, data, {
         baseURL: process.env.API_URL,
         headers: {
             'Authorization': `Bearer ${req.session.token}`

@@ -10,6 +10,7 @@ import { FormDataPasswordReset } from "../../../types/Auth/FormDataPasswordReset
 import { FormDataRegister } from "../../../types/Auth/FormDataRegister";
 import { FormEmailResponse } from "../../../types/Auth/FormEmailResponse";
 import { FormLoginResponse } from "../../../types/Auth/FormLoginResponse";
+import { User } from "../../../types/User";
 
 const AuthContext = createContext<AuthContextType>({
     currentForm: 'email',
@@ -22,6 +23,9 @@ const AuthContext = createContext<AuthContextType>({
     onSubmitForget: () => { },
     loadingFormForget: false,
     token: null,
+    user: null,
+    setUser: () => { },
+    logout: () => { },
 });
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -32,6 +36,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const [loadingFormForget, setLoadingFormForget] = useState(false);
     const [nextURL, setNextURL] = useState('/profile');
     const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     const onSubmitEmail = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -114,12 +119,51 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     }, [setCurrentForm, getHashForm]);
 
+    const logout = () => {
+
+        axios.get("/api/logout").then(() => {
+            setToken(null);
+            setUser(null);
+            router.push("/auth");
+        });
+
+    };
+
     const initAuth = () => {
 
         axios.get<AuthenticationResponse>("/api/session")
         .then(({ data: { token } }) => setToken(token));
 
     };
+
+    useEffect(() => {
+
+        if (token) {
+
+            try {
+
+                const { id, email, photo, personId, name } = JSON.parse(
+                    String(Buffer.from(token.split(".")[1], 'base64'))
+                );
+    
+                setUser({
+                    id,
+                    email,
+                    personId,
+                    photo,
+                    person: {
+                        id: personId,
+                        name,
+                    },
+                });
+
+            } catch (e: any) {
+                console.error("Not parse user from token.");
+            }
+
+        }
+
+    }, [token]);
 
     useEffect(() => {
 
@@ -160,6 +204,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         onSubmitForget,
         loadingFormForget,
         token,
+        user,
+        setUser,
+        logout,
     }}>{children}</AuthContext.Provider>
 }
 

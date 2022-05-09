@@ -130,6 +130,7 @@
     border: none;
     padding: 13px;
     outline: none;
+    cursor: pointer;
   }
   #btn-open,
   #btn-close {
@@ -211,7 +212,7 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      margin-left: 250px;
+      margin-left: 219px;
       padding-bottom: 0;
       > div {
         width: 100%;

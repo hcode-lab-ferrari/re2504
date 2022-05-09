@@ -1,3 +1,4 @@
+import { User } from "../User";
 import { CurrentFormType } from "./CurrentFormType";
 import { FormDataLogin } from "./FormDataLogin";
 import { FormDataPasswordReset } from "./FormDataPasswordReset";
@@ -14,4 +15,7 @@ export type AuthContextType = {
     onSubmitForget: () => void;
     loadingFormForget: boolean;
     token: string | null;
+    user: User | null;
+    setUser: (user: User) => void;
+    logout: () => void;
 }
